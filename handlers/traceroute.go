@@ -52,6 +52,7 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 	if s := req.URL.Query().Get("json"); len(s) > 0 {
 		if s != "0" {
 			fmtJSON = true
+			w.Header().Set("Content-Type", "application/json")
 		}
 	}
 

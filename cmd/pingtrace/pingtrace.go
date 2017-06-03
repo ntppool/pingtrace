@@ -20,7 +20,6 @@ import (
 )
 
 var (
-	config = flag.String("config", "", "pathname of JSON configuration file")
 	listen = flag.String("listen", "127.0.0.1:8060", "listen address")
 
 	privateNets []*net.IPNet
@@ -35,7 +34,7 @@ var Version string
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "Usage: pingtrace [-config=<config>] [-listen=<listen>]")
+		fmt.Fprintln(os.Stderr, "Usage: pingtrace [-listen=<listen>]")
 		flag.PrintDefaults()
 	}
 	log.SetFlags(log.Ltime | log.Lmicroseconds | log.Lshortfile)

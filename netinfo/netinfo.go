@@ -66,6 +66,9 @@ func GetNames(ipStr string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	for i, _ := range addrs {
+		addrs[i] = strings.TrimRight(addrs[i], ".")
+	}
 	return addrs, nil
 }
 

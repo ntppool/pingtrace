@@ -10,8 +10,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/abh/globe/cmdparser"
+	"github.com/abh/pingtrace/cmdparser"
 	"github.com/abh/pingtrace/netinfo"
+	"github.com/kr/pretty"
 )
 
 type TraceRouteLine struct {
@@ -141,11 +142,18 @@ func (trp *TracerouteParser) parseLine(line string) error {
 		}
 
 		if i == index {
-			tr.Name = s
+			// the next entry is the IP
+			if p[index+1][0] == 'b' {
+				tr.Name = s
+			} else {
+				tr.IP = s
+			}
+
 			continue
 		}
 
-		if i == index+1 {
+		// we got a name before, this is the IP
+		if i == index+1 && len(tr.IP) == 0 {
 			// tr.IP = s[1 : len(s)-1]
 			tr.IP = strings.Trim(s, "()")
 			if tr.IP == tr.Name {
@@ -159,6 +167,7 @@ func (trp *TracerouteParser) parseLine(line string) error {
 		}
 
 		if strings.HasPrefix(s, "!") {
+			pretty.Println(tr)
 			tr.Latency[len(tr.Latency)-1].Error = s
 		} else if ip := net.ParseIP(s); ip != nil {
 			// is another IP address

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/abh/globe/cmdparser"
+	"github.com/abh/pingtrace/cmdparser"
 	"github.com/kr/pretty"
 )
 
