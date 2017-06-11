@@ -2,45 +2,14 @@ package handlers
 
 import (
 	"bufio"
-	"errors"
 	"io"
 	"log"
-	"net"
 	"net/http"
 	"os/exec"
 	"sync"
 
 	"github.com/abh/pingtrace/traceroute"
 )
-
-func (h *Handlers) getIP(prefix string, req *http.Request) (*net.IP, error) {
-
-	ipparam := ""
-
-	if len(req.URL.Path) > len(prefix) {
-		ipparam = req.URL.Path[len(prefix):]
-	}
-
-	if len(ipparam) == 0 {
-		return nil, nil
-	}
-
-	ip := net.ParseIP(ipparam)
-	if ip == nil || ip.IsUnspecified() {
-		log.Printf("unspecified ip '%s'", ipparam)
-		return nil, errors.New("unspecified ip")
-	}
-
-	for _, p := range h.PrivateNets {
-		if p.Contains(ip) {
-			log.Println("private ip '%s'", ip.String)
-			return nil, errors.New("private ip")
-		}
-	}
-
-	return &ip, nil
-
-}
 
 // todo: wrap handler that gets the IP, checks for private nets and gets a queue slot
 
