@@ -25,8 +25,17 @@ func (h *Handlers) NTPHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp, err := ntp.Query(ip.String(), 4)
+	var addr string
+	switch ip.To4() == nil {
+	case true:
+		addr = "[" + ip.String() + "]"
+	case false:
+		addr = ip.String()
+	}
+
+	resp, err := ntp.Query(addr, 4)
 	if err != nil {
+		log.Printf("NTP error: %s", err)
 		b, jerr := json.Marshal(err)
 		if jerr != nil {
 			log.Printf("Could not marshall error json '%s': %s", err, jerr)
