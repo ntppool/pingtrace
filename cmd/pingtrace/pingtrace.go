@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "expvar"
 	"flag"
 	"fmt"
 
@@ -9,12 +8,9 @@ import (
 
 	"github.com/rs/cors"
 
-	// Imported for side-effect of handling /debug/vars.
 	"log"
 	"net"
 	"net/http"
-	_ "net/http/pprof"
-	// Imported for side-effect of handling /debug/pprof.
 
 	"os"
 )
