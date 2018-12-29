@@ -10,12 +10,12 @@
   version = "v0.2.0"
 
 [[projects]]
-  digest = "1:a2c1d0e43bd3baaa071d1b9ed72c27d78169b2b269f71c105ac4ba34b1be4a39"
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   pruneopts = "NUT"
-  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
-  version = "v1.1.0"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:7b21c7fc5551b46d1308b4ffa9e9e49b66c7a8b0ba88c0130474b0e7a20d859f"
@@ -42,12 +42,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:834585e9a99fcf1444f2fbe8c5210f9c278d853b5d0fdf843413a7458264751b"
+  digest = "1:f250ca51e5b9215bc2df18f92060a9a835e9f85ab18ebbba0e1a6ef1f8fcdbfe"
   name = "github.com/rs/cors"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "3fb1b69b103a84de38a19c3c6ec073dd6caa4d3f"
-  version = "v1.5.0"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
 
 [[projects]]
   digest = "1:bacb8b590716ab7c33f2277240972c9582d389593ee8d66fc10074e0508b8126"
@@ -59,7 +59,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:becb2131aece71c64ebca5ddfd38cf631784fbb3a678d73ead3b42107c9f41ce"
+  digest = "1:1cea5c02079247fde34247c1a1b97ff8e450d0869bb712414a90703eb31fb354"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -68,7 +68,7 @@
     "ipv4",
   ]
   pruneopts = "NUT"
-  revision = "3673e40ba22529d22c3fd7c93e97b0ce50fa7bdd"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [solve-meta]
   analyzer-name = "dep"
