@@ -6,6 +6,7 @@ import (
 
 	"github.com/abh/pingtrace/handlers"
 
+	gorillahandlers "github.com/gorilla/handlers"
 	"github.com/rs/cors"
 
 	"log"
@@ -64,7 +65,7 @@ func main() {
 	hdl := handlers.NewHandlers()
 	hdl.PrivateNets = privateNets
 
-	h := setupMux(hdl)
+	h := gorillahandlers.LoggingHandler(os.Stdout, setupMux(hdl))
 
 	log.Printf("Listening to '%s'", *listen)
 	err := http.ListenAndServe(*listen, h)
