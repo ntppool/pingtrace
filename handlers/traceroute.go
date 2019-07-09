@@ -53,6 +53,12 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+
+	if !fmtJSON {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	}
+
 	w.WriteHeader(200)
 
 	if !fmtJSON {

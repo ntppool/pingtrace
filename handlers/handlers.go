@@ -7,16 +7,19 @@ import (
 	"net/http"
 )
 
+// Limiter manages the rate limiting
 type Limiter interface {
 	Check() bool
 	Allowed() bool
 	Done()
 }
 
+// Handlers have some common functions for the http handlers
 type Handlers struct {
 	PrivateNets []*net.IPNet
 }
 
+// NewHandlers returns Handlers
 func NewHandlers() *Handlers {
 	return &Handlers{}
 }
@@ -51,7 +54,7 @@ func (h *Handlers) getIP(prefix string, req *http.Request) (*net.IP, error) {
 
 	for _, p := range h.PrivateNets {
 		if p.Contains(ip) {
-			log.Println("private ip '%s'", ip.String)
+			log.Printf("private ip '%s'", ip.String())
 			return nil, errors.New("private ip")
 		}
 	}

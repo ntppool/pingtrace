@@ -5,15 +5,18 @@ import (
 	"net/http"
 )
 
+// RateHandler wraps a handler in rate limiting
 type RateHandler struct {
 	limiter Limiter
 	h       http.Handler
 }
 
+// NewRateHandler returns h wrapped in the Limiter
 func NewRateHandler(h http.Handler, limiter Limiter) *RateHandler {
 	return &RateHandler{limiter: limiter, h: h}
 }
 
+// ServeHTTP implements http.Server interface
 func (rh *RateHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	rh.rated(w, req, rh.h.ServeHTTP)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/beevik/ntp"
 )
 
-// GET /ntp/{ip}
+// NTPHandler implements GET /ntp/{ip}
 func (h *Handlers) NTPHandler(w http.ResponseWriter, req *http.Request) {
 
 	// todo: every so often do a check against the local NTP server,
@@ -45,6 +45,7 @@ func (h *Handlers) NTPHandler(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(b)
