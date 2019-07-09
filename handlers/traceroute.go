@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"sync"
 
-	"github.com/abh/pingtrace/traceroute"
+	"go.ntppool.org/pingtrace/traceroute"
 )
 
 // todo: wrap handler that gets the IP, checks for private nets and gets a queue slot

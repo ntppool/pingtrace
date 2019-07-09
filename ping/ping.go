@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/abh/pingtrace/cmdparser"
 	"github.com/kr/pretty"
+	"go.ntppool.org/pingtrace/cmdparser"
 )
 
 // ping -t 4 -i 0.2 -c 10 some-ip

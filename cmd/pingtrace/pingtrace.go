@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/abh/pingtrace/handlers"
+	"go.ntppool.org/pingtrace/handlers"
 
 	gorillahandlers "github.com/gorilla/handlers"
 	"github.com/rs/cors"

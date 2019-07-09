@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/abh/pingtrace/cmdparser"
-	"github.com/abh/pingtrace/netinfo"
+	"go.ntppool.org/pingtrace/cmdparser"
+	"go.ntppool.org/pingtrace/netinfo"
 	"github.com/kr/pretty"
 )
 
