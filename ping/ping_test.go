@@ -5,9 +5,9 @@ import (
 	"net"
 	"testing"
 
-	"github.com/abh/pingtrace/cmdparser"
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
+	"go.ntppool.org/pingtrace/cmdparser"
 )
 
 func TestParsePingLine(t *testing.T) {
