@@ -1,0 +1,29 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+  - name: fetch
+    image: alpine/git
+    commands:
+    #- git submodule update --init --recursive
+    - git fetch --tags
+
+  - name: test
+    image: golang:1.16
+    commands:
+    - go test -v ./...
+    - go build ./...
+    depends_on: [ clone ]
+
+  - name: release
+    image: golang:1.16
+    environment:
+      FURY_TOKEN:
+        from_secret: fury_token
+    commands:
+    - curl -sL https://git.io/goreleaser | bash -s -- --skip-publish
+    - ./scripts/fury-publish
+    when:
+      event: tag
+    depends_on: [ test ]

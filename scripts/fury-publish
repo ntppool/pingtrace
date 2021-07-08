@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for f in dist/*.rpm dist/*.deb; do
+  echo $f
+  curl -F package=@$f https://${FURY_TOKEN}@push.fury.io/ntppool/
+done
