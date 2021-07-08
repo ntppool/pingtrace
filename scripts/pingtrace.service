@@ -4,7 +4,7 @@ Description=Pingtrace service
 [Service]
 Type=simple
 EnvironmentFile=-/etc/default/pingtrace
-ExecStart=/usr/bin/pingtrace --port=${port}
+ExecStart=/usr/bin/pingtrace --listen=${listen}
 Restart=always
 TimeoutStartSec=10
 RestartSec=10
