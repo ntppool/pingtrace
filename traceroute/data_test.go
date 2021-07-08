@@ -15,7 +15,7 @@ var Tests = []TestData{
 
 			// icmp error codes
 			" 8 * * *",
-			"15  lax1.ntppool.net (207.171.3.2)  67.841 ms !X  67.827 ms !X  67.811 ms !X",
+			"15  lax1.example.com (207.171.3.2)  67.841 ms !X  67.827 ms !X  67.811 ms !X",
 
 			// multiple IPs on a line (from linux traceroute)
 			" 7  72.14.239.48 (72.14.239.48)  49.941 ms 216.239.46.53 (216.239.46.53)  50.084 ms",
@@ -38,7 +38,7 @@ var Tests = []TestData{
 				},
 				nil,
 			},
-			&TraceRouteLine{15, "lax1.ntppool.net", "207.171.3.2", 7012,
+			&TraceRouteLine{15, "blackhole-1.iana.org", "192.175.48.6", 112,
 				[]Latency{
 					Latency{67.841, "!X"},
 					Latency{67.827, "!X"},
@@ -56,7 +56,7 @@ var Tests = []TestData{
 			" 9 (209.85.249.5) AS15169  445.505",
 			" 0 (209.85.249.5) AS15169  50.725  2026.411",
 			" 8  *  *  *",
-			"15 lax1.ntppool.net (207.171.3.2) AS7012  67.841 !X  67.827 !X  67.811 !X",
+			"15 lax1.example.com (207.171.3.2) AS7012  67.841 !X  67.827 !X  67.811 !X",
 		},
 	},
 	TestData{
@@ -77,14 +77,14 @@ var Tests = []TestData{
 			"11  129.250.4.107  43.122 ms  37.377 ms  44.303 ms",
 			"12  198.172.90.74  39.952 ms  40.684 ms  48.832 ms",
 			"13  207.171.30.62  42.627 ms  145.465 ms  35.547 ms",
-			"14  207.171.3.4  41.351 ms !Z  38.477 ms !Z  41.645 ms !Z",
+			"14  192.175.48.6  41.351 ms !Z  38.477 ms !Z  41.645 ms !Z",
 		},
 		Results: []*TraceRouteLine{
 			nil, nil, nil, nil,
 			nil, nil, nil, nil,
 			nil, nil, nil, nil,
 			nil, nil, nil,
-			&TraceRouteLine{14, "207-171-3-4.ntppool.net", "207.171.3.4", 7012,
+			&TraceRouteLine{14, "blackhole-1.iana.org", "192.175.48.6", 112,
 				[]Latency{
 					Latency{41.351, "!Z"},
 					Latency{38.477, "!Z"},

@@ -6,8 +6,8 @@ import (
 )
 
 func TestGetNames(t *testing.T) {
-	ip := "207.171.7.1"
-	expect := "gw.develooper.com."
+	ip := "192.175.48.6"
+	expect := "blackhole-1.iana.org"
 
 	names, err := GetNames(ip)
 	if err != nil {
@@ -20,8 +20,8 @@ func TestGetNames(t *testing.T) {
 }
 
 func TestGetASN(t *testing.T) {
-	ip := "207.171.3.1"
-	expect := 7012
+	ip := "192.175.48.6"
+	expect := 112
 
 	asn, err := GetASN(ip)
 	if err != nil {
