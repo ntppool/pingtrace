@@ -10,14 +10,14 @@ steps:
     - git fetch --tags
 
   - name: test
-    image: golang:1.16
+    image: golang:1.19.3
     commands:
     - go test -v ./...
     - go build ./...
     depends_on: [ clone ]
 
   - name: release
-    image: golang:1.16
+    image: golang:1.19.3
     environment:
       FURY_TOKEN:
         from_secret: fury_token

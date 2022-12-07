@@ -21,19 +21,18 @@ archives:
       #386: i386
       #amd64: x86_64
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
 
 nfpms:
-  -
-    id: pingtrace
+  - id: pingtrace
 
     # Name of the package.
     # Defaults to `ProjectName`.
@@ -58,6 +57,12 @@ nfpms:
     dependencies:
       - ntp
     bindir: /usr/bin
+
+    overrides:
+      deb:
+        dependencies:
+          - "ntp | chrony"
+
     contents:
       - src: "scripts/pingtrace.service"
         dst: "/etc/systemd/system/pingtrace.service"
