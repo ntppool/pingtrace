@@ -1,3 +1,4 @@
+---
 kind: pipeline
 type: kubernetes
 name: default
@@ -10,14 +11,14 @@ steps:
     - git fetch --tags
 
   - name: test
-    image: golang:1.19.3
+    image: golang:1.19.4
     commands:
     - go test -v ./...
     - go build ./...
     depends_on: [ clone ]
 
   - name: release
-    image: golang:1.19.3
+    image: golang:1.19.4
     environment:
       FURY_TOKEN:
         from_secret: fury_token
@@ -27,3 +28,8 @@ steps:
     when:
       event: tag
     depends_on: [ test ]
+---
+kind: signature
+hmac: ffc0c5fafe6711d7032184c00827ccd0327c90239215a8c36e054fcfb355c753
+
+...
