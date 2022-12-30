@@ -84,7 +84,7 @@ const hexDigit = "0123456789abcdef"
 
 func reverseIP(ip net.IP) string {
 	if v4 := ip.To4(); v4 != nil {
-		fmt.Printf("v4: %#v\n", v4)
+		// fmt.Printf("v4: %#v\n", v4)
 		return strconv.Itoa(int(v4[3])) + "." + strconv.Itoa(int(v4[2])) + "." +
 			strconv.Itoa(int(v4[1])) + "." + strconv.Itoa(int(v4[0]))
 	} else {

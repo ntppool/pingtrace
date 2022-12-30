@@ -1,230 +1,114 @@
 package traceroute
 
 import (
-	"bytes"
-	"encoding/json"
+	"bufio"
+	"context"
 	"fmt"
+	"io"
 	"log"
-	"net"
-	"strconv"
-	"strings"
-	"sync"
-
-	"github.com/kr/pretty"
-	"go.ntppool.org/pingtrace/cmdparser"
-	"go.ntppool.org/pingtrace/netinfo"
+	"net/netip"
+	"os/exec"
 )
 
-type TraceRouteLine struct {
-	Hop     int
-	Name    string
-	IP      string
-	ASN     int
-	Latency []Latency
-	Err     error `json:",omitempty"`
+type Traceroute struct {
+	ip   netip.Addr
+	ctx  context.Context
+	pipe io.ReadCloser
+	// ch   chan TraceRouteLine
+	trp *TracerouteParser
 }
 
-type TracerouteParser struct {
-	out chan TraceRouteLine
-	in  chan string
-	hop int
-}
-
-func NewTracerouteParser() *TracerouteParser {
-	trp := new(TracerouteParser)
-	trp.in = make(chan string, 10)
-	trp.out = make(chan TraceRouteLine, 10)
-	go trp.run()
-	return trp
-}
-
-func (trp *TracerouteParser) Add(line string) {
-	trp.in <- line
-}
-
-func (trp *TracerouteParser) Close() {
-	close(trp.in)
-}
-
-func (trp *TracerouteParser) Read() cmdparser.ParserOutput {
-	tr, ok := <-trp.out
-	if !ok {
-		return nil
+func New(ip netip.Addr) (*Traceroute, error) {
+	if !ip.IsValid() {
+		return nil, fmt.Errorf("invalid IP")
 	}
-	return &tr
+	return &Traceroute{
+		ip: ip,
+		// ch: make(chan TraceRouteLine),
+		trp: NewTracerouteParser(),
+	}, nil
 }
 
-func (tr *TraceRouteLine) JSON() []byte {
-	b, _ := json.Marshal(tr)
-	return b
-}
+func (tr *Traceroute) Start(ctx context.Context) error {
 
-func (tr *TraceRouteLine) Bytes() []byte {
-	var b bytes.Buffer
-	fmt.Fprintf(&b, "%2d", tr.Hop)
-	if len(tr.Name) > 0 {
-		fmt.Fprintf(&b, " %s", tr.Name)
+	tr.ctx = ctx
+
+	cmd := exec.CommandContext(ctx, "traceroute", "-q", "2", "-w", "3", "-n", tr.ip.String())
+	// cmd := exec.Command("./slowly.sh", "5")
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
 	}
-	if len(tr.IP) > 0 {
-		fmt.Fprintf(&b, " (%s)", tr.IP)
+
+	err = cmd.Start()
+	if err != nil {
+		return err
 	}
-	if tr.ASN > 0 {
-		fmt.Fprintf(&b, " AS%d", tr.ASN)
-	}
-	for _, ms := range tr.Latency {
-		fmt.Fprint(&b, "  ", ms.String())
-	}
-	return b.Bytes()
+
+	tr.pipe = stdout
+
+	go tr.runner(cmd)
+
+	return nil
 }
 
-func (tr *TraceRouteLine) String() string {
-	b := tr.Bytes()
-	return string(b)
-}
-
-func (tr *TraceRouteLine) Error() error {
-	return tr.Err
-}
-
-func (trp *TracerouteParser) run() {
-	defer close(trp.out)
+func (tr *Traceroute) ReadAll() ([]*TraceRouteLine, error) {
+	lines := make([]*TraceRouteLine, 0)
 	for {
-		line, ok := <-trp.in
+		trl, err := tr.Read()
+		if trl == nil {
+			return lines, nil
+		}
+
+		lines = append(lines, trl)
+
+		if err != nil {
+			return lines, err
+		}
+	}
+}
+
+func (tr *Traceroute) Read() (*TraceRouteLine, error) {
+	select {
+	case trl, ok := <-tr.trp.out:
 		if !ok {
+			return nil, nil
+		}
+		return &trl, nil
+	case <-tr.ctx.Done():
+		return nil, nil
+	}
+}
+
+func (tr *Traceroute) runner(cmd *exec.Cmd) {
+
+	r := bufio.NewReader(tr.pipe)
+	defer tr.trp.Close()
+
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				log.Println("Error reading from traceroute pipe: ", err)
+			}
 			break
 		}
-		err := trp.parseLine(line)
+
+		tr.trp.Add(line)
 		if err != nil {
-			trp.out <- TraceRouteLine{Err: err}
-		}
-	}
-}
-
-func (trp *TracerouteParser) parseLine(line string) error {
-	// "1  ns.unitedwifi.com (172.19.248.1)  3.353 ms  0.959 ms  0.858 ms"
-
-	if strings.HasPrefix(line, "traceroute to ") {
-		// todo: return or parse this as the status/options or something
-		return nil
-	}
-
-	p := strings.Fields(line)
-	log.Printf("%#v", p)
-
-	var err error
-
-	tr := TraceRouteLine{}
-
-	index := 1
-
-	for i, s := range p {
-
-		if i == 0 {
-			// is a domain name or IP
-			if strings.Contains(s, ".") {
-				index = 0
-			} else {
-				tr.Hop, err = strconv.Atoi(s)
-				if err != nil {
-					return err
-				}
-				trp.hop = tr.Hop
-				continue
-			}
-		}
-		if tr.Hop == 0 {
-			tr.Hop = trp.hop
-		}
-
-		if s == "*" {
-			tr.Latency = append(tr.Latency, Latency{0, "*"})
+			log.Printf("Could not parse '%s': %s", line, err)
 			continue
 		}
+	}
 
-		if i == index {
-			// the next entry is the IP
-			if p[index+1][0] == 'b' {
-				tr.Name = s
-			} else {
-				tr.IP = s
-			}
-
-			continue
+	cmdRV := cmd.Wait()
+	if cmdRV != nil {
+		err := cmdRV.Error()
+		if err != "signal: killed" {
+			log.Printf("Error finishing command: %s", cmdRV.Error())
 		}
-
-		// we got a name before, this is the IP
-		if i == index+1 && len(tr.IP) == 0 {
-			// tr.IP = s[1 : len(s)-1]
-			tr.IP = strings.Trim(s, "()")
-			if tr.IP == tr.Name {
-				tr.Name = ""
-			}
-			continue
-		}
-
-		if s == "ms" {
-			continue
-		}
-
-		if strings.HasPrefix(s, "!") {
-			pretty.Println(tr)
-			tr.Latency[len(tr.Latency)-1].Error = s
-		} else if ip := net.ParseIP(s); ip != nil {
-			// is another IP address
-			tr.UpdateASN()
-			trp.out <- tr
-			tr.IP = s
-			index = i
-			tr.Latency = []Latency{}
-		} else {
-			ms, err := strconv.ParseFloat(s, 64)
-			if err != nil {
-				// maybe it's a hostname, so we run traceroute with -n to avoid it...
-				return err
-			}
-			tr.Latency = append(tr.Latency, Latency{ms, ""})
-		}
+		tr.trp.out <- TraceRouteLine{Err: fmt.Errorf("traceroute error: %s", cmdRV.Error())}
 	}
 
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		tr.UpdateASN()
-		wg.Done()
-	}()
-	wg.Add(1)
-	go func() {
-		tr.UpdateName()
-		wg.Done()
-	}()
-	wg.Wait()
-	trp.out <- tr
-
-	return nil
-}
-
-func (tr *TraceRouteLine) UpdateASN() error {
-	if tr.ASN != 0 {
-		return nil
-	}
-	asn, err := netinfo.GetASN(tr.IP)
-	if err != nil {
-		return err
-	}
-	tr.ASN = asn
-	return nil
-}
-
-func (tr *TraceRouteLine) UpdateName() error {
-	if len(tr.Name) > 0 {
-		return nil
-	}
-	names, err := netinfo.GetNames(tr.IP)
-	if err != nil {
-		return err
-	}
-	if len(names) > 0 {
-		tr.Name = names[0]
-	}
-	return nil
 }

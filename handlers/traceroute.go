@@ -1,12 +1,8 @@
 package handlers
 
 import (
-	"bufio"
-	"io"
 	"log"
 	"net/http"
-	"os/exec"
-	"sync"
 
 	"go.ntppool.org/pingtrace/traceroute"
 )
@@ -15,6 +11,8 @@ import (
 
 // GET /traceroute/{ip}
 func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
+
+	ctx := req.Context()
 
 	var fmtJSON bool
 
@@ -36,17 +34,14 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cmd := exec.Command("traceroute", "-q", "2", "-w", "3", "-n", ip.String())
-	// cmd := exec.Command("./slowly.sh", "5")
-
-	stdout, err := cmd.StdoutPipe()
+	tr, err := traceroute.New(*ip)
 	if err != nil {
-		log.Printf("Could not get stdoutpipe: %s", err)
-		w.WriteHeader(500)
+		log.Printf("traceroute: %s", err)
+		w.WriteHeader(400)
 		return
 	}
 
-	err = cmd.Start()
+	err = tr.Start(ctx)
 	if err != nil {
 		log.Printf("Could not start traceroute command: %s", err)
 		w.WriteHeader(500)
@@ -65,67 +60,33 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("Traceroute to " + ip.String() + "\n"))
 	}
 
-	r := bufio.NewReader(stdout)
-
-	trp := traceroute.NewTracerouteParser()
-
-	wg := sync.WaitGroup{}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for {
-			tr := trp.Read()
-			if tr == nil {
-				return
-			}
-
-			if fmtJSON {
-				_, err = w.Write(tr.JSON())
-			} else {
-				_, err = w.Write(tr.Bytes())
-			}
-			if err != nil {
-				log.Printf("Error writing: %s", err)
-			}
-			_, err = w.Write([]byte("\n"))
-			if err != nil {
-				log.Printf("Error writing: %s", err)
-			}
-			w.(http.Flusher).Flush()
-		}
-	}()
-
-	reading := true
-
-	for reading {
-		line, err := r.ReadString('\n')
+	for {
+		trl, err := tr.Read()
 		if err != nil {
-			trp.Close()
-			if err == io.EOF {
-				// got to the end
-				log.Println("eof:", line)
-			} else {
-				log.Println("Error reading from traceroute pipe: ", err)
-			}
+			log.Printf("read error: %s", err)
+			w.WriteHeader(500)
+			break
+		}
+		if trl == nil {
 			break
 		}
 
-		trp.Add(line)
-		if err != nil {
-			log.Printf("Could not parse '%s': %s", line, err)
-			continue
+		if fmtJSON {
+			_, err = w.Write(trl.JSON())
+		} else {
+			_, err = w.Write(trl.Bytes())
 		}
+		if err != nil {
+			log.Printf("Error writing: %s", err)
+		}
+		_, err = w.Write([]byte("\n"))
+		if err != nil {
+			log.Printf("Error writing: %s", err)
+		}
+		w.(http.Flusher).Flush()
 	}
 
-	cmdRV := cmd.Wait()
-	if cmdRV != nil {
-		log.Printf("Error finishing command: %s", err)
-	}
-
-	// make sure we read everything from the parser
-	wg.Wait()
-
+	// final flush
 	w.(http.Flusher).Flush()
 }
 

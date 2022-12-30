@@ -8,6 +8,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/rs/cors v1.8.3
 	github.com/stretchr/testify v1.4.0
+	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab
 )
 
 require (

@@ -5,6 +5,9 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/netip"
+
+	"go4.org/netipx"
 )
 
 // Limiter manages the rate limiting
@@ -16,7 +19,7 @@ type Limiter interface {
 
 // Handlers have some common functions for the http handlers
 type Handlers struct {
-	PrivateNets []*net.IPNet
+	PrivateNets []netip.Prefix
 }
 
 // NewHandlers returns Handlers
@@ -24,7 +27,7 @@ func NewHandlers() *Handlers {
 	return &Handlers{}
 }
 
-func (h *Handlers) getIP(prefix string, req *http.Request) (*net.IP, error) {
+func (h *Handlers) getIP(prefix string, req *http.Request) (*netip.Addr, error) {
 
 	ipparam := ""
 
@@ -36,16 +39,15 @@ func (h *Handlers) getIP(prefix string, req *http.Request) (*net.IP, error) {
 		return nil, nil
 	}
 
-	ip := net.ParseIP(ipparam)
-
-	if ip == nil || ip.IsUnspecified() {
+	ip, err := netip.ParseAddr(ipparam)
+	if err != nil || !ip.IsValid() {
 		ips, err := net.LookupIP(ipparam)
 		if err != nil {
 			log.Printf("could not lookup %q: %s", ipparam, err)
 			return nil, errors.New("could not find")
 		}
 		if len(ips) > 0 {
-			ip = ips[0]
+			ip, _ = netipx.FromStdIP(ips[0])
 		} else {
 			log.Printf("unspecified ip '%s'", ipparam)
 			return nil, errors.New("unspecified ip")

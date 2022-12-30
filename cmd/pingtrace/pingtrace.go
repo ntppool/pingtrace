@@ -10,8 +10,8 @@ import (
 	"github.com/rs/cors"
 
 	"log"
-	"net"
 	"net/http"
+	"net/netip"
 
 	"os"
 )
@@ -19,12 +19,12 @@ import (
 var (
 	listen = flag.String("listen", "127.0.0.1:8060", "listen address")
 
-	privateNets []*net.IPNet
+	privateNets []netip.Prefix
 )
 
 // A version string that can be set with
 //
-//     -ldflags "-X main.Version VERSION"
+//	-ldflags "-X main.Version VERSION"
 //
 // at compile-time.
 var Version string
@@ -38,7 +38,7 @@ func init() {
 
 	pn := []string{"10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"}
 	for _, p := range pn {
-		_, ipnet, err := net.ParseCIDR(p)
+		ipnet, err := netip.ParsePrefix(p)
 		if err != nil {
 			panic(err)
 		}
