@@ -105,11 +105,10 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 			if err == io.EOF {
 				// got to the end
 				log.Println("eof:", line)
-				break
 			} else {
 				log.Println("Error reading from traceroute pipe: ", err)
-				break
 			}
+			break
 		}
 
 		trp.Add(line)
@@ -128,8 +127,6 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 	wg.Wait()
 
 	w.(http.Flusher).Flush()
-
-	return
 }
 
 //

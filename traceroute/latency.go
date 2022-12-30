@@ -17,5 +17,5 @@ func (l Latency) String() string {
 		return fmt.Sprintf("%.3f %s", l.Ms, l.Error)
 	}
 	// just an error
-	return fmt.Sprintf("%s", l.Error)
+	return l.Error
 }

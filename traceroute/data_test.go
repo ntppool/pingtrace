@@ -7,7 +7,7 @@ type TestData struct {
 }
 
 var Tests = []TestData{
-	TestData{
+	{
 		Lines: []string{
 			" 1  ns.unitedwifi.com (172.19.248.1)  3.353 ms  0.959 ms  0.858 ms",
 			" 9  209.85.249.5 (209.85.249.5)  445.505 ms",
@@ -22,32 +22,32 @@ var Tests = []TestData{
 			// " 7 bbisp-gw1-example.com (10.0.74.100) 11.379 ms bbisp-gw2-ae256vla100.example.com (10.0.74.106) 10.554 ms",
 		},
 		Results: []*TraceRouteLine{
-			&TraceRouteLine{1, "ns.unitedwifi.com", "172.19.248.1", 0,
-				[]Latency{Latency{3.353, ""}, Latency{0.959, ""}, Latency{0.858, ""}}, nil,
+			{1, "ns.unitedwifi.com", "172.19.248.1", 0,
+				[]Latency{{3.353, ""}, {0.959, ""}, {0.858, ""}}, nil,
 			},
-			&TraceRouteLine{9, "", "209.85.249.5", 15169, []Latency{Latency{445.505, ""}}, nil},
-			&TraceRouteLine{0, "", "209.85.249.5", 15169,
-				[]Latency{Latency{50.725, ""}, Latency{2026.411, ""}},
+			{9, "", "209.85.249.5", 15169, []Latency{{445.505, ""}}, nil},
+			{0, "", "209.85.249.5", 15169,
+				[]Latency{{50.725, ""}, {2026.411, ""}},
 				nil,
 			},
-			&TraceRouteLine{8, "", "", 0,
+			{8, "", "", 0,
 				[]Latency{
-					Latency{0, "*"},
-					Latency{0, "*"},
-					Latency{0, "*"},
+					{0, "*"},
+					{0, "*"},
+					{0, "*"},
 				},
 				nil,
 			},
-			&TraceRouteLine{15, "blackhole-1.iana.org", "192.175.48.6", 112,
+			{15, "blackhole-1.iana.org", "192.175.48.6", 112,
 				[]Latency{
-					Latency{67.841, "!X"},
-					Latency{67.827, "!X"},
-					Latency{67.811, "!X"},
+					{67.841, "!X"},
+					{67.827, "!X"},
+					{67.811, "!X"},
 				},
 				nil,
 			},
-			&TraceRouteLine{7, "", "72.14.239.48", 15169, []Latency{Latency{49.941, ""}}, nil},
-			&TraceRouteLine{7, "", "216.239.46.53", 15169, []Latency{Latency{50.084, ""}}, nil},
+			{7, "", "72.14.239.48", 15169, []Latency{{49.941, ""}}, nil},
+			{7, "", "216.239.46.53", 15169, []Latency{{50.084, ""}}, nil},
 			// &TraceRouteLine{7, "bbisp-gw1-ae256vla100.example.com", "10.0.74.100", 714, []Latency{Latency{11.379, ""}}, nil},
 			// &TraceRouteLine{7, "bbisp-gw2-ae256vla100.example.com", "10.0.74.106", 714, []Latency{Latency{10.554, ""}}, nil},
 		},
@@ -59,7 +59,7 @@ var Tests = []TestData{
 			"15 lax1.example.com (207.171.3.2) AS7012  67.841 !X  67.827 !X  67.811 !X",
 		},
 	},
-	TestData{
+	{
 		Lines: []string{
 			"traceroute to 207.171.3.4 (207.171.3.4), 64 hops max, 52 byte packets",
 			" 1  192.168.0.1  5.742 ms  1.796 ms  1.945 ms",
@@ -84,11 +84,11 @@ var Tests = []TestData{
 			nil, nil, nil, nil,
 			nil, nil, nil, nil,
 			nil, nil, nil,
-			&TraceRouteLine{14, "blackhole-1.iana.org", "192.175.48.6", 112,
+			{14, "blackhole-1.iana.org", "192.175.48.6", 112,
 				[]Latency{
-					Latency{41.351, "!Z"},
-					Latency{38.477, "!Z"},
-					Latency{41.645, "!Z"},
+					{41.351, "!Z"},
+					{38.477, "!Z"},
+					{41.645, "!Z"},
 				},
 				nil,
 			},

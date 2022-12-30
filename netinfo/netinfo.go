@@ -66,7 +66,7 @@ func GetNames(ipStr string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, _ := range addrs {
+	for i := range addrs {
 		addrs[i] = strings.TrimRight(addrs[i], ".")
 	}
 	return addrs, nil
@@ -75,7 +75,7 @@ func GetNames(ipStr string) ([]string, error) {
 func reverseIPStr(ipStr string) (string, error) {
 	ip := net.ParseIP(ipStr)
 	if ip == nil {
-		return "", errors.New("Could not parse IP")
+		return "", errors.New("could not parse IP")
 	}
 	return reverseIP(ip), nil
 }

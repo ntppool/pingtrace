@@ -48,5 +48,4 @@ func (rh *RateHandler) CheckQueue(w http.ResponseWriter, req *http.Request) {
 
 	log.Println("queue is full, return 503")
 	w.WriteHeader(http.StatusServiceUnavailable)
-	return
 }

@@ -10,9 +10,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/kr/pretty"
 	"go.ntppool.org/pingtrace/cmdparser"
 	"go.ntppool.org/pingtrace/netinfo"
-	"github.com/kr/pretty"
 )
 
 type TraceRouteLine struct {
@@ -21,7 +21,7 @@ type TraceRouteLine struct {
 	IP      string
 	ASN     int
 	Latency []Latency
-	err     error `json:",omitempty"`
+	Err     error `json:",omitempty"`
 }
 
 type TracerouteParser struct {
@@ -83,7 +83,7 @@ func (tr *TraceRouteLine) String() string {
 }
 
 func (tr *TraceRouteLine) Error() error {
-	return tr.err
+	return tr.Err
 }
 
 func (trp *TracerouteParser) run() {
@@ -95,7 +95,7 @@ func (trp *TracerouteParser) run() {
 		}
 		err := trp.parseLine(line)
 		if err != nil {
-			trp.out <- TraceRouteLine{err: err}
+			trp.out <- TraceRouteLine{Err: err}
 		}
 	}
 }
