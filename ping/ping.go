@@ -23,7 +23,7 @@ type PingResponse struct {
 	// ASN     int
 	// TTL     int
 	// Latency Latency
-	err error `json:"Error,omitempty"`
+	err error // `json:"Error,omitempty"`
 }
 
 // --- 8.8.8.8 ping statistics ---
@@ -46,7 +46,7 @@ type PingSummary struct {
 	RoundTripAvg    float64
 	RoundTripMax    float64
 	RoundTripStdDev float64
-	err             error `json:"Error,omitempty"`
+	err             error // `json:"Error,omitempty"`
 }
 
 type PingParser struct {

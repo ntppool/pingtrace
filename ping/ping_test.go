@@ -1,35 +1,33 @@
 package ping
 
 import (
-	"fmt"
 	"net"
+	"reflect"
 	"testing"
 
-	"github.com/kr/pretty"
-	"github.com/stretchr/testify/assert"
 	"go.ntppool.org/pingtrace/cmdparser"
 )
 
 func TestParsePingLine(t *testing.T) {
 
 	testLines := [][]string{
-		[]string{
+		{
 			"64 bytes from 8.8.8.8: icmp_seq=2 ttl=46 time=34.540 ms",
 			"From 64.233.174.41 icmp_seq=8 Time to live exceeded",
 			"Request timeout for icmp_seq 387",
 		},
-		[]string{
+		{
 			"--- 8.8.8.8 ping statistics ---",
 			"58 packets transmitted, 58 packets received, 0.0% packet loss",
 			"round-trip min/avg/max/stddev = 34.750/40.406/70.660/5.502 ms",
 		},
 
-		[]string{
+		{
 			"--- 192.0.2.1 ping statistics ---",
 			"11 packets transmitted, 0 received, +7 errors, 100% packet loss, time 10215ms",
 		},
 
-		[]string{
+		{
 			"64 bytes from 8.8.4.4: icmp_seq=4 ttl=52 time=26.7 ms",
 			"64 bytes from 8.8.4.4: icmp_seq=5 ttl=52 time=26.7 ms",
 			"",
@@ -38,7 +36,7 @@ func TestParsePingLine(t *testing.T) {
 			"rtt min/avg/max/mdev = 26.768/26.783/26.793/0.146 ms",
 		},
 
-		[]string{
+		{
 			"--- 4.4.2.2 ping statistics ---",
 			"10 packets transmitted, 0 received, 100% packet loss, time 3000ms",
 			"",
@@ -89,18 +87,25 @@ func TestParsePingLine(t *testing.T) {
 			if pr == nil {
 				break
 			}
-			assert.Nil(t, pr.Error())
+
 			if pr.Error() != nil {
-				assert.Fail(t, fmt.Sprintf("err: %s\n", pr.Error()))
-				continue
+				t.Logf("err: %s\n", pr.Error())
+				t.Fail()
 			}
-			pretty.Println("Got result:", i, pr)
-			pretty.Println("Expects", results[i])
-			pretty.Println("Got    ", pr)
-			assert.Equal(t, results[i], pr)
+
+			// pretty.Println("Got result:", i, pr)
+			// pretty.Println("Expects", results[i])
+			// pretty.Println("Got    ", pr)
+			if !reflect.DeepEqual(results[i], pr) {
+				t.Logf("got %q, expected %q", pr, results[i])
+				t.Fail()
+			}
 
 			if len(strings) > i && len(strings[i]) > 0 {
-				assert.Equal(t, strings[i], pr.String())
+				if strings[i] != pr.String() {
+					t.Logf("got %q, expected %q", pr.String(), strings[i])
+					t.Fail()
+				}
 			}
 
 			i = i + 1

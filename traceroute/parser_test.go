@@ -1,10 +1,8 @@
 package traceroute
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestParseTracerouteLine(t *testing.T) {
@@ -31,10 +29,9 @@ func TestParseTracerouteLine(t *testing.T) {
 				if tr == nil {
 					break
 				}
-				assert.Nil(t, tr.Error())
+
 				if tr.Error() != nil {
-					fmt.Printf("err: %s\n", tr.Error())
-					continue
+					t.Fatalf("err: %s\n", tr.Error())
 				}
 				// pretty.Println("Got result:", i, tr)
 				// pretty.Println("Expects", results[i])
@@ -42,11 +39,18 @@ func TestParseTracerouteLine(t *testing.T) {
 
 				if len(td.Results) > i {
 					if td.Results[i] != nil {
-						assert.Equal(t, td.Results[i], tr)
+						if !reflect.DeepEqual(td.Results[i], tr) {
+							t.Logf("got %+v, expected %+v", tr, td.Results[i])
+							t.Fail()
+						}
 					}
 				}
 				if len(td.Strings) > i && len(td.Strings[i]) > 0 {
-					assert.Equal(t, td.Strings[i], tr.String())
+					if td.Strings[i] != tr.String() {
+						t.Logf("got %q, expected %q", tr.String(), td.Strings[i])
+						t.Fail()
+
+					}
 				}
 
 				i = i + 1
