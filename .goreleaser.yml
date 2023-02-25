@@ -56,6 +56,7 @@ nfpms:
       amd64: x86_64
     dependencies:
       - ntp
+      - traceroute
     bindir: /usr/bin
 
     overrides:

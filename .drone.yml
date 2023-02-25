@@ -11,14 +11,14 @@ steps:
     - git fetch --tags
 
   - name: test
-    image: golang:1.19.5
+    image: golang:1.20.1
     commands:
     - go test -v ./...
     - go build ./...
     depends_on: [ clone ]
 
   - name: release
-    image: golang:1.19.5
+    image: golang:1.20.1
     environment:
       FURY_TOKEN:
         from_secret: fury_token
@@ -30,6 +30,6 @@ steps:
     depends_on: [ test ]
 ---
 kind: signature
-hmac: 4f26c1b5d33078a34ec37129b8c18e1d7b4dafc1150760f51c12de9c8bae513d
+hmac: e144dcb26466edc9f64f090128d3c2a502aba5fdcdfc132220afe02c516efcbe
 
 ...
