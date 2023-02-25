@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"net/netip"
 
 	"go.ntppool.org/pingtrace/traceroute"
 )
@@ -34,7 +35,7 @@ func (h *Handlers) TracerouteHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	tr, err := traceroute.New(*ip)
+	tr, err := traceroute.New(*ip, netip.Addr{})
 	if err != nil {
 		log.Printf("traceroute: %s", err)
 		w.WriteHeader(400)

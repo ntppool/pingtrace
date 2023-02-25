@@ -5,14 +5,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/netip"
 	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/kr/pretty"
 	"go.ntppool.org/pingtrace/cmdparser"
 	"go.ntppool.org/pingtrace/netinfo"
 )
+
+type TraceRouteResult struct {
+	SourceIP netip.Addr
+	TargetIP netip.Addr
+	Lines    []*TraceRouteLine
+}
 
 type TraceRouteLine struct {
 	Hop     int
@@ -20,6 +26,7 @@ type TraceRouteLine struct {
 	IP      string
 	ASN     int
 	Latency []Latency
+	Raw     string
 	Err     error `json:",omitempty"`
 }
 
@@ -97,7 +104,7 @@ func (trp *TracerouteParser) run() {
 		}
 		err := trp.parseLine(line)
 		if err != nil {
-			trp.out <- TraceRouteLine{Err: err}
+			trp.out <- TraceRouteLine{Err: err, Raw: line}
 		}
 	}
 }
@@ -115,7 +122,7 @@ func (trp *TracerouteParser) parseLine(line string) error {
 
 	var err error
 
-	tr := TraceRouteLine{}
+	tr := TraceRouteLine{Raw: line}
 
 	index := 1
 
@@ -169,7 +176,7 @@ func (trp *TracerouteParser) parseLine(line string) error {
 		}
 
 		if strings.HasPrefix(s, "!") {
-			pretty.Println(tr)
+			// pretty.Println(tr)
 			tr.Latency[len(tr.Latency)-1].Error = s
 		} else if ip := net.ParseIP(s); ip != nil {
 			// is another IP address

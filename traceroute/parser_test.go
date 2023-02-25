@@ -1,7 +1,6 @@
 package traceroute
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -39,8 +38,8 @@ func TestParseTracerouteLine(t *testing.T) {
 
 				if len(td.Results) > i {
 					if td.Results[i] != nil {
-						if !reflect.DeepEqual(td.Results[i], tr) {
-							t.Logf("got %+v, expected %+v", tr, td.Results[i])
+						if td.Results[i].String() != tr.String() {
+							t.Logf("got %q, expected %q", tr.String(), td.Results[i].String())
 							t.Fail()
 						}
 					}
